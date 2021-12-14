@@ -209,9 +209,32 @@ CREATE TABLE area_isochrones_scenario
 	area_isochrone NUMERIC, 
 	geom geometry, 
 	scenario_id integer,
+	prd DOUBLE PRECISION,
+	pedshed double precision, 
 	CONSTRAINT area_isochrones_scenario_pkey PRIMARY KEY (gid),
     CONSTRAINT area_isochrones_scenario_fkey FOREIGN KEY (scenario_id)
     REFERENCES scenarios(scenario_id) ON DELETE CASCADE
 );
 
 CREATE INDEX ON area_isochrones_scenario USING GIST(geom);
+
+CREATE TABLE link_node_scenario
+(
+	gid serial,
+	grid_id integer, 
+	link NUMERIC, 
+	node NUMERIC,
+	con_node NUMERIC,
+	geom geometry, 
+	scenario_id integer,
+	street_density DOUBLE PRECISION,
+    link_node_ratio DOUBLE PRECISION,  
+	connected_node_ratio DOUBLE PRECISION,
+    gamma DOUBLE PRECISION, 
+    alpha DOUBLE PRECISION, 
+	CONSTRAINT link_node_scenario_pkey PRIMARY KEY (gid),
+    CONSTRAINT link_node_scenario_fkey FOREIGN KEY (scenario_id)
+    REFERENCES scenarios(scenario_id) ON DELETE CASCADE
+);
+
+CREATE INDEX ON link_node_scenario USING GIST(geom);

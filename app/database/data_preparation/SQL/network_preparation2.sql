@@ -43,6 +43,19 @@ SET class_ids = array[0]
 FROM vertices_to_update v
 WHERE ways_vertices_pgr.id = v.id;
 
+UPDATE ways 
+SET Source_cnt = v.cnt 
+FROM ways_vertices_pgr v 
+WHERE v.id=ways.source;
+
+UPDATE ways 
+SET target_cnt = v.cnt 
+FROM ways_vertices_pgr v 
+WHERE v.id=ways.target;
+
+CREATE INDEX ON ways USING btree(Source_cnt);
+CREATE INDEX ON ways USING btree(target_cnt);
+
 --Identify death_end in the network
 DROP TABLE IF EXISTS death_end_v;
 CREATE TEMP TABLE death_end_v AS 

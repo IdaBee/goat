@@ -10,6 +10,8 @@ ALTER TABLE ways rename column the_geom to geom;
 ALTER TABLE ways_vertices_pgr rename column the_geom to geom;
 ALTER TABLE ways alter column target type int4;
 ALTER TABLE ways alter column source type int4;
+ALTER TABLE ways ADD COLUMN source_cnt integer; 
+ALTER TABLE ways ADD COLUMN target_cnt integer;
 
 CREATE INDEX ON ways USING GIST(geom);
 

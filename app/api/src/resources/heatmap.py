@@ -61,6 +61,24 @@ def recompute_heatmap(scenario_id):
     for g in gridids:
         db.perform("""SELECT compute_area_isochrone(%(grid_id)s,%(scenario_id)s,2,%(userid)s)""", 
         {"grid_id": g[0], "scenario_id": scenario_id, "userid": userid})
+        
+    smaller_grids = db.select("""SELECT UNNEST(gridids) FROM changed_grids""")
+    
+    db.perform("""SELECT connectivity_network(%(scenario_id)s)""", 
+        {"scenario_id": scenario_id})
+    
+    for j in smaller_grids:
+        db.perform("""SELECT connectivity_indicators(%(grid_id)s,%(scenario_id)s)""", 
+        {"grid_id": j[0], "scenario_id": scenario_id})
+        
+    for j in smaller_grids:
+        db.perform("""SELECT compute_prd(%(grid_id)s,%(scenario_id)s)""", 
+        {"grid_id": j[0], "scenario_id": scenario_id})
+    
+    for j in smaller_grids:
+        db.perform("""SELECT compute_pedshed(%(grid_id)s,%(scenario_id)s,2,%(userid)s)""", 
+        {"grid_id": g[0], "scenario_id": scenario_id, "userid": userid})
+   
    
     buffer_geom = db.select("""SELECT DISTINCT ST_AsText(ST_UNION(geom)) FROM changed_grids""")[0][0]
     db.perform('''UPDATE scenarios 
@@ -111,3 +129,23 @@ def heatmap_connectivity(modus_input, scenario_id_input, return_type):
     params={"scenario_id_input": scenario_id_input,"modus_input": modus_input}, return_type=return_type)   
     
     return result 
+
+def heatmap_prd(modus_input, scenario_id_input, return_type):
+    if modus_input in ('scenario','comparison'):
+        recompute_heatmap(scenario_id_input)
+
+    result = db.select('''SELECT per_prd AS score, %(modus_input)s AS modus, geom
+    FROM heatmap_prd(%(modus_input)s,%(scenario_id_input)s)''',
+    params={"scenario_id_input": scenario_id_input,"modus_input": modus_input}, return_type=return_type)   
+    
+    return result 
+
+#def heatmap_cnr(modus_input, scenario_id_input, return_type):
+#    if modus_input in ('scenario','comparison'):
+#        recompute_heatmap(scenario_id_input)
+
+#    result = db.select('''SELECT percentile_connected_node_ratio AS score, %(modus_input)s AS modus, geom
+#    FROM heatmap_cnr(%(modus_input)s,%(scenario_id_input)s)''',
+#    params={"scenario_id_input": scenario_id_input,"modus_input": modus_input}, return_type=return_type)   
+    
+#    return result 

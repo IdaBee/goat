@@ -141,9 +141,21 @@ gridids = db_conn.select('SELECT grid_id FROM grid_heatmap;')
 
 for i in gridids:
 	i = i[0]
-	db_conn.perform(f'''SELECT compute_area_isochrone({i},0,1,0);''')	
+	db_conn.perform(f'''SELECT compute_area_isochrone({i},0,1,0);''')
+
+for i in gridids:
+	i = i[0]
+	db_conn.perform(f'''SELECT compute_pedshed({i},0,1,0);''')
 
 db_conn.perform(sql_grid_population)
+
+db_conn.perform(sql_grid_connectivity)
+
+for i in gridids:
+	i = i[0]
+	db_conn.perform(f'''SELECT compute_prd({i},0);''')
+ 
+db_conn.perform(sql_percentile_prd) 	
 
 end = time.time()
 print('Running the script took:')
